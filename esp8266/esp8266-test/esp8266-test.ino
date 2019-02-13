@@ -8,6 +8,9 @@
 // PIN D1 on ESP -> GPIO5
 #define ONE_WIRE_DATA_PIN 5
 
+// PIN D2 on ESP -> GPIO4
+#define RELAY_PIN 4
+
 const char* ssid = "TELUS0061";
 const char* wifi_password = "4ismjd62yr";
 const char* mqtt_server_address = "192.168.1.69";
@@ -57,9 +60,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if ((char)payload[0] == '1') {
     Serial.println("Turning LED ON");
     digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(RELAY_PIN, LOW);
   } else {
     Serial.println("Turning LED OFF");
     digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(RELAY_PIN, HIGH);
   }
 }
 
@@ -100,12 +105,20 @@ void setup_led()
   digitalWrite(LED_BUILTIN, HIGH);
 }
 
+void setup_relay()
+{
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, HIGH);
+}
+
 void setup() {
   Serial.begin(115200);         // Start the Serial communication to send messages to the computer
   delay(10);
   Serial.println('\n');
 
   setup_led();
+
+  setup_relay();
   
   setup_wifi();
   mqttClient.setServer(mqtt_server_address, mqtt_server_port);
